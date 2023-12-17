@@ -1,0 +1,55 @@
+<!-- views/viewposts.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles/layout.css">
+    <title>Document</title>
+
+    <script>
+        // Initialize the posts array on the client side with data from the server
+        var posts = "<%= JSON.stringify(posts) %>";
+
+        async function deletePost(index) {
+            try {
+                const response = await fetch(`/deletepost/${index}`, { method: 'DELETE' });
+                const updatedPosts = await response.json();
+
+                // Update the posts array on the client side
+                posts = updatedPosts;
+                renderPosts();
+            } catch (error) {
+                console.error('Error deleting post:', error);
+            }
+        }
+
+        function renderPosts() {
+            // For simplicity, reload the page to re-render the posts container
+            location.reload();
+        }
+    </script>
+</head>
+<body>
+    <%- include('home.ejs') %>
+   
+
+    <div id="post-container">
+        <% if (locals.posts.length>0) { %>
+            <h1>Posts</h1>
+            <% for (let i = 0; i < locals.posts.length; i++) { %>
+                <div class="post">
+                    <h2><%= locals.posts[i].blogTitle %></h2>
+                    <p>Created by: <%= locals.posts[i].createdBy %></p>
+                    <p><%= locals.posts[i].blogContent %></p>
+                    <p>Timestamp: <%= locals.posts[i].timestamp %></p>
+                    <!-- Pass the index to the deletePost function -->
+                    <button onclick="deletePost('<%= i %>')" id="delete-post">Delete</button>
+                </div>
+            <% } %>
+        <% } %>
+    </div>
+</body>
+</html>
